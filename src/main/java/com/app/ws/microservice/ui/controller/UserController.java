@@ -23,10 +23,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserRest> createUser(@RequestBody UserDetailsRequestModel userDetailsRequestModel) {
 
-        UserRest userRest = new UserRest();
         final UserDto userDto = modelMapper.map(userDetailsRequestModel, UserDto.class);
         final UserDto createUser = userservice.createUser(userDto);
-        userRest = modelMapper.map(createUser, UserRest.class);
+        UserRest userRest = modelMapper.map(createUser, UserRest.class);
 
         return ResponseEntity.ok(userRest);
     }
