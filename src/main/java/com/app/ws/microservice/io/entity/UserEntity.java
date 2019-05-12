@@ -17,13 +17,13 @@ public class UserEntity implements Serializable {
 
     @javax.persistence.Id
     @GeneratedValue
-    private String Id;
+    private Long Id;
 
     @Column(nullable = false)
     private String userId;
 
     @Column(nullable = false, length = 50)
-    private String name;
+    private String firstName;
 
     @Column(nullable = false, length = 50)
     private String lastName;

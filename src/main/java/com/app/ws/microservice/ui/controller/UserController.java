@@ -7,10 +7,7 @@ import com.app.ws.microservice.ui.model.response.UserRest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users")
@@ -28,6 +25,13 @@ public class UserController {
         UserRest userRest = modelMapper.map(createUser, UserRest.class);
 
         return ResponseEntity.ok(userRest);
+    }
+
+    @GetMapping(path = "{id}")
+    public ResponseEntity<UserRest> retrieveUserMessage(@PathVariable String id) {
+        UserDto userDto = userservice.findUserById(id);
+
+        return ResponseEntity.ok(modelMapper.map(userDto, UserRest.class));
     }
 
     @Autowired
