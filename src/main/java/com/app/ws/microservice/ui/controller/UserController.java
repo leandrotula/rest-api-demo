@@ -6,6 +6,7 @@ import com.app.ws.microservice.ui.model.request.UserDetailsRequestModel;
 import com.app.ws.microservice.ui.model.response.UserRest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,8 @@ public class UserController {
     private UserService userservice;
 
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRest> createUser(@RequestBody UserDetailsRequestModel userDetailsRequestModel) {
 
         final UserDto userDto = modelMapper.map(userDetailsRequestModel, UserDto.class);
@@ -27,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok(userRest);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRest> retrieveUserMessage(@PathVariable String id) {
         UserDto userDto = userservice.findUserById(id);
 
