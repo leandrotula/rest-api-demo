@@ -1,5 +1,6 @@
 package com.app.ws.microservice.service;
 
+import com.app.ws.microservice.exceptions.UserException;
 import com.app.ws.microservice.io.entity.UserEntity;
 import com.app.ws.microservice.io.repository.UserRepository;
 import com.app.ws.microservice.shared.dto.UserDto;
@@ -73,6 +74,20 @@ public class UserServiceImpl implements UserService {
         }
 
         return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+    }
+
+
+    @Override
+    public UserDto updateUser(final String id, final UserDto userDto) {
+
+        if (userDto == null) {
+            throw new UserException(id);
+        }
+        UserEntity byUserId = userRepository.findByUserId(id);
+        byUserId.setFirstName(userDto.getFirstName());
+        byUserId.setFirstName(userDto.getLastName());
+        userRepository.save(byUserId);
+        return modelMapper.map(byUserId, UserDto.class);
     }
 
     @Autowired
