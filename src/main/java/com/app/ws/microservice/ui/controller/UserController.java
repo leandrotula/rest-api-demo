@@ -8,12 +8,16 @@ import com.app.ws.microservice.ui.model.request.UserDetailsRequestModel;
 import com.app.ws.microservice.ui.model.response.UserRest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("users")
@@ -54,6 +58,27 @@ public class UserController {
 
         return ResponseEntity.ok(userRest);
 
+    }
+
+    @DeleteMapping(path = "{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+
+        this.userservice.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserRest>> retrieveAllUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                     @RequestParam(value = "limit", defaultValue = "35") int limit) {
+
+        List<UserDto> userDtos = this.userservice.retrieveAllUsers(page, limit);
+
+        List<UserRest> userRests = userDtos.stream()
+                .map(inUser -> this.modelMapper.map(inUser, UserRest.class))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userRests);
     }
 
     @Autowired
