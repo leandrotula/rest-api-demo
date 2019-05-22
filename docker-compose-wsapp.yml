@@ -17,7 +17,7 @@ services:
     - /tmp:/var/lib/mysql
 
   springbootdocker:
-    image: leandrotula/ws-microservice:ws-service
+    image: leandrotula/ws-microservice:v2
     ports:
     - "8081:8081"
     restart: always
