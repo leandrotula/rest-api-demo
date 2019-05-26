@@ -3,6 +3,8 @@ package com.app.ws.microservice.shared.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 public class UserDto {
@@ -16,4 +18,5 @@ public class UserDto {
     private String encryptedPassword;
     private String emailVerificationToken;
     private Boolean emailVerificationStatus = false;
+    private List<AddressDto> addresses;
 }

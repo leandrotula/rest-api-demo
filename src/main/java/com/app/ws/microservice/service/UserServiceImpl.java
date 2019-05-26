@@ -3,8 +3,10 @@ package com.app.ws.microservice.service;
 import com.app.ws.microservice.exceptions.UserException;
 import com.app.ws.microservice.io.entity.UserEntity;
 import com.app.ws.microservice.io.repository.UserRepository;
+import com.app.ws.microservice.shared.dto.AddressDto;
 import com.app.ws.microservice.shared.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,15 +19,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -38,10 +39,16 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(userDto.getEmail()) != null) {
             throw new RuntimeException(String.format("User with email %s already exists", userDto.getEmail()));
         }
+        for(int i=0; i<userDto.getAddresses().size(); i++) {
+          AddressDto addressDto = userDto.getAddresses().get(i);
+          addressDto.setAddressId(RandomStringUtils.randomAlphabetic(8));
+          addressDto.setUserDto(userDto);
+          userDto.getAddresses().set(i, addressDto);
+        }
         final UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
         userEntity.setEmailVerificationToken(UUID.randomUUID().toString());
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-        userEntity.setUserId(UUID.randomUUID().toString());
+        userEntity.setUserId(RandomStringUtils.randomAlphabetic(8));
         final UserDto savedUserData = modelMapper.map(userEntity, UserDto.class);
         userRepository.save(userEntity);
         return savedUserData;
@@ -101,7 +108,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void deleteUser(final String id) {
         log.debug("Deleting user with id {} ", id);
         UserEntity user = userRepository.findByUserId(id);

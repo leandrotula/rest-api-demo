@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Setter
 @Getter
@@ -19,5 +20,6 @@ public class UserDetailsRequestModel {
 	private String lastName;
 	private String email;
 	private String password;
+	private List<AddressRequestModel> addresses;
 
 }

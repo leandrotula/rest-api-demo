@@ -1,21 +1,24 @@
 package com.app.ws.microservice.ui.controller;
 
-import com.app.ws.microservice.exceptions.ExceptionMessages;
-import com.app.ws.microservice.exceptions.UserException;
+import com.app.ws.microservice.service.AddressService;
 import com.app.ws.microservice.service.UserService;
+import com.app.ws.microservice.shared.dto.AddressDto;
 import com.app.ws.microservice.shared.dto.UserDto;
 import com.app.ws.microservice.ui.model.request.UserDetailsRequestModel;
+import com.app.ws.microservice.ui.model.response.AddressRest;
 import com.app.ws.microservice.ui.model.response.UserRest;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
+import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ public class UserController {
 
     private ModelMapper modelMapper;
     private UserService userservice;
+    private AddressService addressService;
 
 
     @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
@@ -81,6 +85,22 @@ public class UserController {
         return ResponseEntity.ok(userRests);
     }
 
+    @GetMapping(path = "{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<AddressRest>> retrieveAddress(@PathVariable String id) {
+
+        List<AddressRest> addressRests = new LinkedList<>();
+        List<AddressDto> addressDtos = addressService.findAddresses(id);
+
+        if(!CollectionUtils.isEmpty(addressDtos)) {
+
+            Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+            addressRests = modelMapper.map(addressDtos, listType);
+        }
+
+        return ResponseEntity.ok(addressRests);
+
+    }
+
     @Autowired
     public void setModelMapper(final ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
@@ -89,5 +109,10 @@ public class UserController {
     @Autowired
     public void setUserservice(final UserService userservice) {
         this.userservice = userservice;
+    }
+
+    @Autowired
+    public void setAddressService(final AddressService addressService) {
+        this.addressService = addressService;
     }
 }
