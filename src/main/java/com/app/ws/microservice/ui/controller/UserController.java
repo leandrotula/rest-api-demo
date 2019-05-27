@@ -10,6 +10,9 @@ import com.app.ws.microservice.ui.model.response.UserRest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -99,6 +102,32 @@ public class UserController {
 
         return ResponseEntity.ok(addressRests);
 
+    }
+
+    @GetMapping(path = "{userId}/addresses/{addressId}",
+            produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<AddressRest> retrieveSingleAddress(@PathVariable String addressId, @PathVariable String userId) {
+
+        AddressDto addressDto = addressService.findByAddressId(addressId);
+        AddressRest addressRest = modelMapper.map(addressDto, AddressRest.class);
+        Link link = WebMvcLinkBuilder
+                .linkTo(UserController.class)
+                .slash(userId)
+                .slash("addresses")
+                .slash(addressId).withSelfRel();
+        Link addressesLink = WebMvcLinkBuilder
+                .linkTo(UserController.class)
+                .slash(userId)
+                .slash("addresses")
+                .withRel("addresses");
+        Link usersLink = WebMvcLinkBuilder
+                .linkTo(UserController.class)
+                .slash(userId)
+                .withRel("users");
+        addressRest.add(link);
+        addressRest.add(usersLink);
+        addressRest.add(addressesLink);
+        return ResponseEntity.ok(addressRest);
     }
 
     @Autowired

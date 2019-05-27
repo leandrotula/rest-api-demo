@@ -6,6 +6,7 @@ import com.app.ws.microservice.io.entity.UserEntity;
 import com.app.ws.microservice.io.repository.AddressRepository;
 import com.app.ws.microservice.io.repository.UserRepository;
 import com.app.ws.microservice.shared.dto.AddressDto;
+import com.app.ws.microservice.shared.dto.UserDto;
 import com.app.ws.microservice.ui.model.response.AddressRest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -40,6 +41,16 @@ public class AddressServiceImpl implements AddressService {
         Type listType = new TypeToken<List<AddressDto>>() {}.getType();
         return modelMapper.map(allByUserDto, listType);
 
+    }
+
+    @Override
+    public AddressDto findByAddressId(final String addressId) {
+        AddressEntity byAddressId = addressRepository.findByAddressId(addressId);
+        if (byAddressId == null) {
+            throw new UserException(String.format("Could not find single Address for address id %s", addressId));
+        }
+
+        return modelMapper.map(byAddressId, AddressDto.class);
     }
 
     @Autowired

@@ -7,4 +7,6 @@ import java.util.List;
 public interface AddressService {
 
     List<AddressDto> findAddresses(final String userId);
+
+    AddressDto findByAddressId(final String addressId);
 }
