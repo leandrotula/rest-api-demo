@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(final String id, final UserDto userDto) {
 
         if (userDto == null) {
-            throw new UserException(id);
+            throw new UserException(String.format("UserDto cannot be process for id %s", id));
         }
         UserEntity byUserId = userRepository.findByUserId(id);
         byUserId.setFirstName(userDto.getFirstName());
