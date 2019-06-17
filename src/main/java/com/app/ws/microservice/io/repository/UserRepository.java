@@ -13,9 +13,10 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity, L
     UserEntity findByEmail(final String email);
     UserEntity findByUserId(final String id);
 
-    @Query(value = "select * from users u where u.email_verification_status = 'true'",
-            countQuery = "select count(*) from users u where u.email_verification_status = 'true'",
+    @Query(value = "select * from users u where u.email_verification_status = '1'",
+            countQuery = "select count(*) from users u where u.email_verification_status = '1'",
             nativeQuery = true)
     Page<UserEntity> retrieveAllUsersWithConfirmedEmail(final Pageable request);
+
 
 }

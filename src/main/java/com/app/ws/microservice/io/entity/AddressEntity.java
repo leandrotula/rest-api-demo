@@ -4,16 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "Addresses")
+@Table(name = "addresses")
 @Setter
 @Getter
-public class AddressEntity {
+public class AddressEntity implements Serializable {
 
-    @Id
+    @javax.persistence.Id
     @GeneratedValue
-    private long id;
+    private Long id;
 
     @Column(length=30, nullable=false)
     private String addressId;
