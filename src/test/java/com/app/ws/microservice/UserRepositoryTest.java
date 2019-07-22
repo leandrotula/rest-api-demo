@@ -16,10 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +43,7 @@ public class UserRepositoryTest {
                 .withDatabaseName("user_app")
                 .withUsername("admin")
                 .withPassword("admin")
-                .withLogConsumer(new Slf4jLogConsumer(logger))) {
+                ) {
             mysql.start();
         }
     }
@@ -64,7 +65,9 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @SqlGroup({
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-False.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
     public void shouldReturnUserByEmail() {
 
         UserEntity userEntity = userRepository.findByEmail("leandrotula@gmail.com");
@@ -75,7 +78,9 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @SqlGroup({
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-False.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
     public void shouldReturnUserByUserId() {
 
         UserEntity userEntity = userRepository.findByUserId("ABCZEQ1");
@@ -83,6 +88,41 @@ public class UserRepositoryTest {
         assertThat(userEntity.getFirstName()).isEqualTo("Leandro");
         assertThat(userEntity.getLastName()).isEqualTo("Tula");
         assertThat(userEntity.getEmailVerificationStatus()).isEqualTo(true);
+    }
+
+    @Test
+    @SqlGroup({
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-False.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
+    public void shouldRetrieveUsersByFirstName() {
+
+        List<UserEntity> users = userRepository.findByUserFirstName("Leandro");
+        assertThat(users.isEmpty()).isFalse();
+        UserEntity userEntity = users.iterator().next();
+        assertThat(userEntity).isNotNull();
+        assertThat(userEntity.getFirstName()).isEqualTo("Leandro");
+    }
+
+    @Test
+    @SqlGroup({
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
+    public void shouldUpdateBaseStatusBaseOnUserId() {
+
+        userRepository.updateUserWithNewEmailStatus(0, "ABCZEQ1");
+        UserEntity userEntity = userRepository.findByUserId("ABCZEQ1");
+        assertThat(userEntity).isNotNull();
+        assertThat(userEntity.getEmailVerificationStatus()).isFalse();
+    }
+
+    //This particular test, is using jpql, just to show main difference between jpql and native query
+    @Test
+    @SqlGroup({
+            @Sql(scripts = "classpath:insert-userRegisteredEmail-True.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)})
+    public void shouldRetrieveUserById() {
+
+        UserEntity userEntity = userRepository.retrieveByUserId("ABCZEQ1");
+        assertThat(userEntity).isNotNull();
+        assertThat(userEntity.getFirstName()).isEqualTo("Leandro");
     }
 
     @After
