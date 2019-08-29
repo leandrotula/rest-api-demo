@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(final UserDto userDto) {
 
         if (userRepository.findByEmail(userDto.getEmail()) != null) {
-            throw new RuntimeException(String.format("User with email %s already exists", userDto.getEmail()));
+            throw new UserException(String.format("User with email %s already exists", userDto.getEmail()));
         }
         for(int i=0; i<userDto.getAddresses().size(); i++) {
           AddressDto addressDto = userDto.getAddresses().get(i);
@@ -71,16 +71,6 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UsernameNotFoundException(String.format("User Not found for id %s", id));
         }
-    }
-
-    @Autowired
-    public void setUserRepository(final UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setModelMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -133,5 +123,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setbCryptPasswordEncoder(final BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @Autowired
+    public void setUserRepository(final UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 }

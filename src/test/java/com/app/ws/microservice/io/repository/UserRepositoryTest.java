@@ -1,7 +1,6 @@
-package com.app.ws.microservice;
+package com.app.ws.microservice.io.repository;
 
 import com.app.ws.microservice.io.entity.UserEntity;
-import com.app.ws.microservice.io.repository.UserRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(locations="classpath:application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserRepositoryTest.class);
 
     @Autowired
     private UserRepository userRepository;
