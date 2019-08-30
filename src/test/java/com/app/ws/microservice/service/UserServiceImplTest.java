@@ -40,8 +40,6 @@ public class UserServiceImplTest {
     @Mock
     UserRepository userRepository;
 
-    ModelMapper modelMapper;
-
     @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -52,8 +50,7 @@ public class UserServiceImplTest {
 
         userService = new UserServiceImpl();
         userService.setUserRepository(userRepository);
-        this.modelMapper = new ModelMapper();
-        userService.setModelMapper(modelMapper);
+        userService.setModelMapper(new ModelMapper());
         userService.setbCryptPasswordEncoder(bCryptPasswordEncoder);
     }
 

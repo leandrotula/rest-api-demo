@@ -6,12 +6,9 @@ import com.app.ws.microservice.io.entity.UserEntity;
 import com.app.ws.microservice.io.repository.AddressRepository;
 import com.app.ws.microservice.io.repository.UserRepository;
 import com.app.ws.microservice.shared.dto.AddressDto;
-import com.app.ws.microservice.shared.dto.UserDto;
-import com.app.ws.microservice.ui.model.response.AddressRest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
