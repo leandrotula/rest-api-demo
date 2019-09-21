@@ -6,14 +6,16 @@ import com.app.ws.microservice.io.entity.UserEntity;
 import com.app.ws.microservice.io.repository.UserRepository;
 import com.app.ws.microservice.shared.dto.AddressDto;
 import com.app.ws.microservice.shared.dto.UserDto;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,11 +33,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class UserServiceImplTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+@RunWith(JUnitPlatform.class)
+class UserServiceImplTest {
 
     @Mock
     UserRepository userRepository;
@@ -43,10 +43,10 @@ public class UserServiceImplTest {
     @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    UserServiceImpl userService;
+    private UserServiceImpl userService;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
 
         userService = new UserServiceImpl();
         userService.setUserRepository(userRepository);
@@ -55,22 +55,23 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldThrowExceptionDueNonExistentEmail() {
+    @DisplayName("If no email exists, during user creation then we should get an exception")
+    void shouldThrowExceptionDueNonExistentEmail() {
 
         UserEntity userInformation = new UserEntity();
         userInformation.setEmail("testemail@mail.com");
         when(userRepository.findByEmail(anyString())).thenReturn(userInformation);
-        expectedException.expect(UserException.class);
         UserDto userDto = new UserDto();
         userDto.setEmail("testemail@mail.com");
-        userService.createUser(userDto);
+        Assertions.assertThrows(UserException.class, () -> userService.createUser(userDto));
         ArgumentCaptor<String> emailArgCaptor = ArgumentCaptor.forClass(String.class);
         verify(userRepository).findByEmail(emailArgCaptor.capture());
         assertThat(emailArgCaptor.getValue()).isEqualTo("testemail@mail.com");
     }
 
     @Test
-    public void shouldSuccessfullySaveUser() {
+    @DisplayName("a user should be successfully save if it does not exists previously")
+    void shouldSuccessfullySaveUser() {
 
         when(userRepository.findByEmail(anyString())).thenReturn(null);
         UserDto userDto = retrieveUserDto();
@@ -79,16 +80,16 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldGetExceptionDueNonExistentEmail() {
+    @DisplayName("While trying get an user, if the emails does not exist, then we should get an exception")
+    void shouldGetExceptionDueNonExistentEmail() {
 
         when(userRepository.findByEmail(anyString())).thenReturn(null);
-        expectedException.expect(UsernameNotFoundException.class);
-        userService.getUser("test@email.com");
-
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userService.getUser("test@email.com"));
     }
 
     @Test
-    public void shouldRetrieveFoundUserByEmail() {
+    @DisplayName("if user exists, with email, then we should be able to retrieve it successfully")
+    void shouldRetrieveFoundUserByEmail() {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@emailtest.com");
@@ -108,7 +109,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldDeleteFoundUser() {
+    void shouldDeleteFoundUser() {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@emailtest.com");
@@ -124,17 +125,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldThrowErrorDueDeletionOfNonExistentUser() {
+    @DisplayName("If the user does not exists, then we should get an exception while trying to perform deletion")
+    void shouldThrowErrorDueDeletionOfNonExistentUser() {
 
         when(userRepository.findByUserId(anyString())).thenReturn(null);
-        expectedException.expect(UserException.class);
-        userService.deleteUser("userid");
+        Assertions.assertThrows(UserException.class, () -> userService.deleteUser("userid"));
         verify(userRepository, times(1)).findByUserId(anyString());
-        verify(userRepository, never()).findByUserId(anyString());
+        verify(userRepository, times(1)).findByUserId(anyString());
     }
 
     @Test
-    public void shouldRetrieveAllPaginatedUsers() {
+    @DisplayName("We should retrieve paginated users")
+    void shouldRetrieveAllPaginatedUsers() {
 
         Pageable pageReq = PageRequest.of(1, 1);
         UserEntity userOne = new UserEntity();
